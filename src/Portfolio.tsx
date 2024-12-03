@@ -4,9 +4,13 @@ import { Moon, Sun, Mail, Download, ExternalLink, Code, BookOpen, Briefcase, Use
 import { AnimatedSection } from './components/AnimatedSection';
 import { ConfigPanel } from './components/ConfigPanel';
 import { AnimatedCoder } from './components/AnimatedCoder';
-import { SkillStats } from './components/SkillStats';
+import { AnimatedLogo } from './components/AnimatedLogo';
+import { AnimatedBackground } from './components/AnimatedBackground';
+import { DownloadModal } from './components/DownloadModal';
+import { Notification } from './components/Notification';
 import { PortfolioConfig, defaultConfig } from './types/config';
 import { portfolioData } from './data/portfolioData';
+import { SkillStats } from './components/SkillStats';
 
 // Interfaces
 interface AccordionProps {
@@ -60,13 +64,99 @@ const Card: React.FC<CardProps> = ({ children, className = '', config }) => {
 const Portfolio = () => {
   const [config, setConfig] = useState<PortfolioConfig>(defaultConfig);
   const [showConfig, setShowConfig] = useState(false);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [notification, setNotification] = useState<{
+    message: string;
+    type: 'success' | 'error';
+    isVisible: boolean;
+  }>({
+    message: '',
+    type: 'success',
+    isVisible: false,
+  });
 
   useEffect(() => {
     document.documentElement.className = config.style.darkMode ? 'dark' : 'light';
   }, [config.style.darkMode]);
 
+  const CV_FILENAME = 'Mohamad Ibrahim M.pdf';
+
+  const handleDownload = () => {
+    setShowDownloadModal(true);
+  };
+
+  const handleDownloadConfirm = async () => {
+    try {
+      // Create a new response for each operation
+      const response = await fetch(`/${encodeURIComponent(CV_FILENAME)}`);
+      if (!response.ok) {
+        throw new Error('CV file not found');
+      }
+
+      // Clone the response for download
+      const downloadResponse = response.clone();
+      
+      // Get the content type
+      const contentType = response.headers.get('content-type');
+      console.log('File content type:', contentType);
+
+      // Create blob from the cloned response
+      const blob = await downloadResponse.blob();
+      
+      // Create a temporary URL for the blob
+      const url = window.URL.createObjectURL(
+        new Blob([await response.arrayBuffer()], { 
+          type: 'application/pdf'
+        })
+      );
+      
+      // Create an invisible link and trigger download
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = CV_FILENAME;
+      
+      // Append to body and click
+      document.body.appendChild(link);
+      link.click();
+      
+      // Clean up
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }, 100);
+      
+      setShowDownloadModal(false);
+      setNotification({
+        message: 'CV downloaded successfully!',
+        type: 'success',
+        isVisible: true,
+      });
+    } catch (error) {
+      console.error('Download error:', error);
+      setNotification({
+        message: 'Error downloading CV. Please try again.',
+        type: 'error',
+        isVisible: true,
+      });
+    }
+  };
+
+  const handleDownloadCancel = () => {
+    setShowDownloadModal(false);
+    setNotification({
+      message: 'Download cancelled',
+      type: 'error',
+      isVisible: true,
+    });
+  };
+
+  const closeNotification = () => {
+    setNotification(prev => ({ ...prev, isVisible: false }));
+  };
+
   return (
-    <div className={`min-h-screen ${config.style.darkMode ? 'dark bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
+    <div className={`min-h-screen ${config.style.darkMode ? 'dark bg-gray-900/50 text-white' : 'bg-white/50 text-gray-900'}`}>
+      <AnimatedBackground isDarkMode={config.style.darkMode} />
       {/* Navigation */}
       <motion.nav 
         initial={{ y: -100 }}
@@ -75,7 +165,10 @@ const Portfolio = () => {
         className="fixed w-full top-0 z-50 backdrop-blur-sm bg-white/70 dark:bg-gray-900/70 shadow-sm"
       >
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold">{portfolioData.personal.name}</h1>
+          <div className="flex items-center space-x-3">
+            <AnimatedLogo className="w-8 h-8" isDarkMode={config.style.darkMode} />
+            <h1 className="text-xl font-bold">{portfolioData.personal.name}</h1>
+          </div>
           <button
             onClick={() => setConfig(prev => ({ ...prev, style: { ...prev.style, darkMode: !prev.style.darkMode } }))}
             className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -114,13 +207,13 @@ const Portfolio = () => {
                   <Mail className="w-4 h-4" />
                   <span>Contact Me</span>
                 </a>
-                <a
-                  href={portfolioData.personal?.resumeLink}
+                <button
+                  onClick={handleDownload}
                   className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
                 >
                   <Download className="w-4 h-4" />
                   <span>Download CV</span>
-                </a>
+                </button>
               </div>
             </Card>
           </motion.div>
@@ -368,6 +461,20 @@ const Portfolio = () => {
         setConfig={setConfig}
         showConfig={showConfig}
         setShowConfig={setShowConfig}
+      />
+
+      <DownloadModal
+        isOpen={showDownloadModal}
+        onClose={handleDownloadCancel}
+        onConfirm={handleDownloadConfirm}
+        pdfUrl="/Mohamad Ibrahim M.pdf"
+      />
+
+      <Notification
+        message={notification.message}
+        type={notification.type}
+        isVisible={notification.isVisible}
+        onClose={closeNotification}
       />
     </div>
   );
