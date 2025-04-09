@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { useInView } from 'react-intersection-observer';
 import { Moon, Sun, Mail, Download, ExternalLink, Code, BookOpen, Briefcase, User, ChevronDown, Globe } from 'lucide-react';
 import { AnimatedSection } from './components/AnimatedSection';
 import { ConfigPanel } from './components/ConfigPanel';
 import { AnimatedCoder } from './components/AnimatedCoder';
-import { AnimatedLogo } from './components/AnimatedLogo';
+import AnimatedLogo from './components/AnimatedLogo';
 import { AnimatedBackground } from './components/AnimatedBackground';
 import { DownloadModal } from './components/DownloadModal';
-import { Notification } from './components/Notification';
+import Notification from './components/Notification';
 import { PortfolioConfig, defaultConfig } from './types/config';
 import { portfolioData } from './data/portfolioData';
-import { SkillStats } from './components/SkillStats';
+import SkillStats from './components/SkillStats';
 
 // Interfaces
 interface AccordionProps {
@@ -57,6 +58,64 @@ const Card: React.FC<CardProps> = ({ children, className = '', config }) => {
   return (
     <div className={`bg-white dark:bg-gray-800 ${className}`} style={cardStyle}>
       {children}
+    </div>
+  );
+};
+
+const CustomDropdown: React.FC<{
+  value: string;
+  onChange: (value: string) => void;
+  options: { value: string; label: string }[];
+}> = ({ value, onChange, options }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const selectedOption = options.find(opt => opt.value === value);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-36 py-2 px-3 rounded-md flex gap-1 items-center justify-between bg-transparent border border-gray-300 dark:border-gray-600 text-text focus:outline-none focus:border-primary cursor-pointer transition-colors hover:border-primary"
+      >
+        <span>{selectedOption?.label}</span>
+        <ChevronDown className={`w-4 h-4 text-text-light transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+      
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          className="absolute z-10 w-full mt-1 bg-white dark:bg-[#1f2937] rounded-md shadow-lg border border-border"
+        >
+          {options.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => {
+                onChange(option.value);
+                setIsOpen(false);
+              }}
+              className={`w-full px-3 py-2 text-left text-text hover:bg-background-dark dark:hover:bg-background transition-colors ${
+                value === option.value ? 'bg-background-dark dark:bg-background' : ''
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </motion.div>
+      )}
     </div>
   );
 };
@@ -229,17 +288,17 @@ const Portfolio = () => {
                 <Code className="w-6 h-6" />
                 <h2 className="text-2xl font-bold">Skills & Expertise</h2>
               </div>
-              <select
+              <CustomDropdown
                 value={config.style.skillsView}
-                onChange={(e) => setConfig(prev => ({
+                onChange={(value) => setConfig(prev => ({
                   ...prev,
-                  style: { ...prev.style, skillsView: e.target.value as 'card' | 'stats' }
+                  style: { ...prev.style, skillsView: value as 'card' | 'stats' }
                 }))}
-                className="px-3 py-1 rounded-md border dark:bg-gray-800 dark:border-gray-700"
-              >
-                <option value="card">Card View</option>
-                <option value="stats">Stats View</option>
-              </select>
+                options={[
+                  { value: 'card', label: 'Card View' },
+                  { value: 'stats', label: 'Stats View' }
+                ]}
+              />
             </div>
             {config.style.skillsView === 'stats' ? (
               <SkillStats skills={portfolioData.skills} config={config} />

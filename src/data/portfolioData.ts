@@ -67,7 +67,7 @@ export const portfolioData: PortfolioData = {
   skills: {
     "Advanced": ["HTML", "CSS", "Tailwind CSS"],
     "Intermediate": ["JavaScript", "React", "Angular", "NodeJs", "MS Office", "Figma", "Adobe"],
-    "Basic": ["dotNet"]
+    "Basic": ["dotNet" , "Vue"]
   },
   experience: [
     {
@@ -83,7 +83,7 @@ export const portfolioData: PortfolioData = {
       description: 'Served as an intern in the role of a front-end developer. Undertook comprehensive training in HTML, CSS, and JavaScript.'
     }
   ],
-  projects: [
+  projects : [
     {
       title: 'Bank of India',
       period: '01/2022 - 10/2022',
@@ -109,10 +109,28 @@ export const portfolioData: PortfolioData = {
       technologies:["Angular TS", "Tailwind CSS"]
     },
     {
+      title: 'TVSE Auction India',
+      period: '07/2024 - 09/2024',
+      description: 'Developed an admin and customer web application for managing the acution and bidding activities for products. Features included the dynamic components using angular and angular material; Tailwind CSS configuration used for styling.',
+      technologies:["Angular TS","Angular Material", "Tailwind CSS"]
+    },
+    {
       title: 'Survey Application',
-      period: '07/2024 - Present',
+      period: '09/2024 - 10/2024',
       description: 'Developed an admin application for managing tree plantation and sapling activities for Green Earth Initiatives. Features included tracking sapling orders, scheduling plantations, and managing volunteers. Ensured data security and compliance with environmental regulations.',
       technologies:["dotNet","Postgres","React", "Tailwind CSS"]
+    },
+    {
+      title: 'Red FM',
+      period: '12/2024 - 01/2025',
+      description: 'Developed and maintained a dynamic web application for RED FM using React.js and Tailwind CSS, ensuring a seamless user experience across devices.Designed responsive UI components for key modules, including live radio streaming, program schedules, and event highlights, adhering to modern Collaborated closely with backend teams to integrate APIs, ensuring optimal data flow and performance.Optimized application performance by implementing best practices in state management and reducing load times.Worked with cross-functional teams to deliver features on time while maintaining code quality and adhering to Agile methodologies.',
+      technologies:["React", "Tailwind CSS"]
+    },
+    {
+      title: 'Dedalus',
+      period: '2/2024 - Present',
+      description: 'Developed and maintained a dynamic web application for Dedalus using Angular / Material and Tailwind CSS, ensuring a seamless user experience across devices. Implementing the ngRx concept for maitaining the global state management.',
+      technologies:["Angular TS","Angular Material", "Tailwind CSS"]
     },
     {
       title: "Insect Detection in crops using CNN",
@@ -133,18 +151,6 @@ export const portfolioData: PortfolioData = {
       institution: "Anna University - Paavai Engineering College",
       period: "2017 - 2021",
       score: "85%"
-    },
-    {
-      degree: "HSC",
-      institution: "State Board",
-      period: "2016 - 2017",
-      score: "60%"
-    },
-    {
-      degree: "SSLC",
-      institution: "State Board",
-      period: "2014 - 2015",
-      score: "87.46%"
     }
   ],
   languages: [
