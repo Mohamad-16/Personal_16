@@ -1,0 +1,26 @@
+<!-- Placeholder wrapper for the user's provided SVG. Replace this file with the exact SVG snippet if desired. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 225" width="300" height="225" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="100%" stop-color="#a78bfa"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="300" height="225" rx="16" fill="url(#grad)"/>
+  <g>
+    <circle cx="80" cy="112" r="38" fill="#ffffff" opacity="0.9">
+      <animate attributeName="r" values="34;38;34" dur="3s" repeatCount="indefinite" />
+    </circle>
+    <rect x="130" y="82" width="100" height="18" rx="6" fill="#ffffff" opacity="0.9">
+      <animate attributeName="x" values="130;135;130" dur="2.5s" repeatCount="indefinite" />
+    </rect>
+    <rect x="130" y="110" width="120" height="14" rx="6" fill="#ffffff" opacity="0.7">
+      <animate attributeName="width" values="90;120;90" dur="2.2s" repeatCount="indefinite" />
+    </rect>
+    <rect x="130" y="132" width="90" height="14" rx="6" fill="#ffffff" opacity="0.5">
+      <animate attributeName="x" values="130;125;130" dur="2s" repeatCount="indefinite" />
+    </rect>
+  </g>
+</svg>
+
+

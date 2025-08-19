@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
-import { Moon, Sun, Mail, Download, ExternalLink, Code, BookOpen, Briefcase, User, ChevronDown, Globe } from 'lucide-react';
+import { Moon, Sun, Mail, Download, Code, BookOpen, Briefcase, User, ChevronDown, Globe } from 'lucide-react';
 import { AnimatedSection } from './components/AnimatedSection';
 import { ConfigPanel } from './components/ConfigPanel';
 import { AnimatedCoder } from './components/AnimatedCoder';
@@ -12,13 +11,11 @@ import Notification from './components/Notification';
 import { PortfolioConfig, defaultConfig } from './types/config';
 import { portfolioData } from './data/portfolioData';
 import SkillStats from './components/SkillStats';
+import SkillCarousel from './components/SkillCarousel';
+import ExperienceGraphic from './components/ExperienceGraphic';
 
 // Interfaces
-interface AccordionProps {
-  title: string;
-  children: React.ReactNode;
-  defaultOpen?: boolean;
-}
+// (Removed unused AccordionProps interface)
 
 interface CardProps {
   children: React.ReactNode;
@@ -26,27 +23,7 @@ interface CardProps {
   config: PortfolioConfig;
 }
 
-// Custom Accordion Component
-const Accordion: React.FC<AccordionProps> = ({ title, children, defaultOpen = false }) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
-  
-  return (
-    <div className="border rounded-lg mb-2">
-      <button
-        className="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-800"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <span className="font-semibold">{title}</span>
-        <ChevronDown className={`w-5 h-5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-      </button>
-      {isOpen && (
-        <div className="px-4 py-3 border-t">
-          {children}
-        </div>
-      )}
-    </div>
-  );
-};
+// (Removed unused Accordion component)
 
 // Custom Card Component
 const Card: React.FC<CardProps> = ({ children, className = '', config }) => {
@@ -163,11 +140,7 @@ const Portfolio = () => {
       const blob = await downloadResponse.blob();
       
       // Create a temporary URL for the blob
-      const url = window.URL.createObjectURL(
-        new Blob([await response.arrayBuffer()], { 
-          type: 'application/pdf'
-        })
-      );
+      const url = window.URL.createObjectURL(blob);
       
       // Create an invisible link and trigger download
       const link = document.createElement('a');
@@ -244,7 +217,7 @@ const Portfolio = () => {
 
       {/* Hero Section */}
       <AnimatedSection config={config.animation} className="pt-32 pb-16 px-6">
-        <div className="container mx-auto max-w-4xl">
+        <div className="container mx-auto max-w-6xl">
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -281,7 +254,7 @@ const Portfolio = () => {
 
       {/* Skills Section */}
       <AnimatedSection config={config.animation} className="py-16 px-6">
-        <div className="container mx-auto max-w-4xl">
+        <div className="container mx-auto max-w-6xl">
           <Card config={config} className="p-6 hover:shadow-xl transition-all duration-300">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-2">
@@ -303,39 +276,7 @@ const Portfolio = () => {
             {config.style.skillsView === 'stats' ? (
               <SkillStats skills={portfolioData.skills} config={config} />
             ) : (
-              <div className="space-y-6">
-                {Object.entries(portfolioData.skills).map(([level, skillList], sectionIndex) => (
-                  <motion.div
-                    key={level}
-                    initial={{ x: -20, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ delay: sectionIndex * 0.2 }}
-                    className="space-y-3"
-                  >
-                    <h3 className="text-lg font-semibold">{level} Skills</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      {skillList.map((skill, idx) => (
-                        <motion.div
-                          key={idx}
-                          initial={{ y: 20, opacity: 0 }}
-                          animate={{ y: 0, opacity: 1 }}
-                          transition={{ delay: (sectionIndex * skillList.length + idx) * 0.1 }}
-                          whileHover={{ scale: 1.05 }}
-                          className={`p-4 rounded-lg text-center transition-all cursor-pointer ${
-                            level === 'Advanced'
-                              ? 'bg-gradient-to-br from-blue-500/10 to-purple-500/10 hover:from-blue-500/20 hover:to-purple-500/20'
-                              : level === 'Intermediate'
-                              ? 'bg-gradient-to-br from-green-500/10 to-blue-500/10 hover:from-green-500/20 hover:to-blue-500/20'
-                              : 'bg-gradient-to-br from-yellow-500/10 to-green-500/10 hover:from-yellow-500/20 hover:to-green-500/20'
-                          }`}
-                        >
-                          {skill}
-                        </motion.div>
-                      ))}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+              <SkillCarousel skills={portfolioData.skills} />
             )}
           </Card>
         </div>
@@ -343,11 +284,14 @@ const Portfolio = () => {
 
       {/* Experience Section */}
       <AnimatedSection config={config.animation} className="py-16 px-6">
-        <div className="container mx-auto max-w-4xl">
+        <div className="container mx-auto max-w-6xl">
           <Card config={config} className="p-6 hover:shadow-xl transition-all duration-300">
             <div className="flex items-center space-x-2 mb-6">
               <Briefcase className="w-6 h-6" />
               <h2 className="text-2xl font-bold">Work Experience</h2>
+            </div>
+            <div className="mb-6">
+              {/* <ExperienceGraphic /> */}
             </div>
             <div className="space-y-6">
               {portfolioData.experience.map((exp, index) => (
@@ -385,7 +329,7 @@ const Portfolio = () => {
 
       {/* Projects Section */}
       <AnimatedSection config={config.animation} className="py-16 px-6">
-        <div className="container mx-auto max-w-4xl">
+        <div className="container mx-auto max-w-6xl">
           <Card config={config} className="p-6 hover:shadow-xl transition-all duration-300">
             <div className="flex items-center space-x-2 mb-6">
               <Code className="w-6 h-6" />
@@ -428,7 +372,7 @@ const Portfolio = () => {
 
       {/* Education Section */}
       <AnimatedSection config={config.animation} className="py-16 px-6">
-        <div className="container mx-auto max-w-4xl">
+        <div className="container mx-auto max-w-6xl">
           <Card config={config} className="p-6 hover:shadow-xl transition-all duration-300">
             <div className="flex items-center space-x-2 mb-6">
               <BookOpen className="w-6 h-6" />
@@ -455,7 +399,7 @@ const Portfolio = () => {
 
       {/* Languages Section */}
       <AnimatedSection config={config.animation} className="py-16 px-6">
-        <div className="container mx-auto max-w-4xl">
+        <div className="container mx-auto max-w-6xl">
           <Card config={config} className="p-6 hover:shadow-xl transition-all duration-300">
             <div className="flex items-center space-x-2 mb-6">
               <Globe className="w-6 h-6" />
@@ -482,7 +426,7 @@ const Portfolio = () => {
 
       {/* Footer Section */}
       <AnimatedSection config={config.animation} className="py-8 px-6 bg-gray-50 dark:bg-gray-900">
-        <div className="container mx-auto max-w-4xl">
+        <div className="container mx-auto max-w-6xl">
           <div className="text-center">
             <p className="text-gray-600 dark:text-gray-400">
               &copy; {new Date().getFullYear()} {portfolioData.personal.name}. All rights reserved.
