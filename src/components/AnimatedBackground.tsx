@@ -77,6 +77,82 @@ export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({ isDarkMo
           </svg>
         </div>
       )}
+
+      {/* Theme-aware animated code text overlay */}
+      <div className="absolute inset-0 pointer-events-none select-none">
+        {[
+          'function animationLoop() { requestAnimationFrame(animationLoop); }',
+          'const sum = (a, b) => a + b; // TODO: memoize',
+          'for (let i = 0; i < items.length; i++) { render(items[i]); }',
+          'useEffect(() => { return () => cleanup(); }, [])',
+          'export const fetchData = async (url) => (await fetch(url)).json()',
+          'if (state === "loading") setStatus("ready")',
+          'try { doThing(); } catch (e) { console.error(e) }',
+          'Array.from(new Set(values)).sort()',
+          'const theme = isDark ? "dark" : "light"',
+          'return <motion.div animate={{ opacity: 1 }} />',
+        ].map((code, idx) => {
+          const left = Math.random() * 70 + 10; // keep inside content band
+          const top = Math.random() * 80 + 5;
+          const rotate = Math.random() * 8 - 4;
+          const duration = 6 + Math.random() * 6;
+          const color = isDarkMode
+            ? ['#93c5fd', '#a78bfa', '#34d399', '#fbbf24', '#fda4af'][idx % 5]
+            : ['#1f2937', '#334155', '#0f766e', '#7c3aed', '#b45309'][idx % 5];
+          const opacity = isDarkMode ? 0.25 : 0.18;
+          return (
+            <motion.div
+              key={idx}
+              style={{
+                position: 'absolute',
+                left: `${left}%`,
+                top: `${top}%`,
+                color,
+                transform: `rotate(${rotate}deg)`,
+                whiteSpace: 'nowrap',
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+                fontSize: '12px',
+                opacity,
+                textShadow: isDarkMode ? '0 0 12px rgba(99, 102, 241, 0.15)' : '0 0 8px rgba(99, 102, 241, 0.06)'
+              }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity, y: [0, -6, 0] }}
+              transition={{ duration, repeat: Infinity, ease: 'easeInOut', delay: idx * 0.2 }}
+            >
+              {code}
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {/* Code-editor style side gutters that fade toward the content area */}
+      <div className="pointer-events-none absolute inset-y-0 left-0">
+        <div
+          className="h-full"
+          style={{
+            width: 'calc((100vw - min(72rem, 100vw)) / 2)',
+            backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'} 1px, transparent 1px)`,
+            backgroundSize: '24px 24px',
+            opacity: isDarkMode ? 0.35 : 0.25,
+            maskImage: 'linear-gradient(to right, black 65%, transparent)',
+            WebkitMaskImage: 'linear-gradient(to right, black 65%, transparent)'
+          }}
+        />
+      </div>
+
+      <div className="pointer-events-none absolute inset-y-0 right-0">
+        <div
+          className="h-full"
+          style={{
+            width: 'calc((100vw - min(72rem, 100vw)) / 2)',
+            backgroundImage: `linear-gradient(to right, ${isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'} 1px, transparent 1px), linear-gradient(to bottom, ${isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'} 1px, transparent 1px)`,
+            backgroundSize: '24px 24px',
+            opacity: isDarkMode ? 0.35 : 0.25,
+            maskImage: 'linear-gradient(to left, black 65%, transparent)',
+            WebkitMaskImage: 'linear-gradient(to left, black 65%, transparent)'
+          }}
+        />
+      </div>
     </div>
   );
 };
